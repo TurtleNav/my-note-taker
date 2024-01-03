@@ -1,7 +1,10 @@
-const fs = require('fs');
-const express = require('express');
 const path = require('path');
-const crypto = require('crypto');
+
+const express = require('express');
+
+const {getUUID} = require('./utils/uuid');
+const db = require('./utils/db');
+
 
 const PORT = process.env.PORT || 3001;
 
@@ -24,28 +27,36 @@ app.get('/notes', (req, res) =>
 
 app.get('/api/notes', (req, res) => {
   // Send a message to the client
-  //res.json(`${req.method} request received to get reviews`);
 
   // Log our request to the terminal
-  console.info(`${req.method} request received to get reviews`);
+  console.info(`${req.method} request received to get notes`);
 
-  fs.readFile('./db/db.json', 'utf8', (err, data) => {
-    const reviews = JSON.parse(data);
-    res.json(reviews);
-  })
-
-  console.log(crypto.randomBytes(4).toString('hex'));
+  res.json(JSON.stringify(db.notes));
 });
 
 app.post('/api/notes', (req, res) => {
-    console.info(`${req.method} request received to get reviews`);
+    console.info(`${req.method} request received to notes`);
 
-    fs.readFile('./db/db.json', 'utf8', (err, data) => {
-        const reviews = JSON.parse(data);
-        res.json(reviews);
-    })
+    const {title, text} = req.body;
+    if (title && text) {
+        const newNote = {
+            title: title,
+            text: text,
+            uuid: getUUID(),
+        };
+        db.addNote(newNote);
 
-
+        // Send back the new note JSON as a response
+        const response = {
+            status: 'success',
+            body: newNote,
+          };
+      
+        console.log(response);
+        res.status(201).json(response);
+    } else {
+        res.status(500).json('Error in saving note');
+    }
 });
 
 
