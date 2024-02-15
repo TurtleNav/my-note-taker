@@ -12,7 +12,7 @@ if (window.location.pathname === '/notes') {
   saveNoteBtn = document.querySelector('.save-note');
   newNoteBtn = document.querySelector('.new-note');
   clearBtn = document.querySelector('.clear-btn');
-  noteList = document.querySelectorAll('.list-container .list-group');
+  noteList = document.querySelectorAll('.list-group');
 }
 
 // Show an element
@@ -167,22 +167,27 @@ const renderNoteList = async (notes) => {
     }
 
     return liEl;
-  };
+  }; // createLi
 
   if (!jsonNotes.length) {
     noteListItems.push(createLi('No saved Notes', false));
   }
 
+  const listParent = document.getElementById('list-group')
+  // for-each note create an li
   jsonNotes.forEach((note) => {
+    console.log('note -> ', note)
     const li = createLi(note.title);
-    li.dataset.note = JSON.stringify(note);
-
+    li.textContent = note.text;
     noteListItems.push(li);
+    listParent.append(li)
   });
+
+  console.log('note list items -> ', noteListItems)
 
   // Changed from '/notes'
   if (window.location.pathname === './notes') {
-    noteListItems.forEach((note) => noteList[0].append(note));
+    noteListItems.forEach((note) => noteList.append(note));
   }
 };
 
