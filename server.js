@@ -1,9 +1,6 @@
 const path = require('path');
-
 const express = require('express');
-
 const db = require('./utils/db');
-
 const PORT = process.env.PORT || 3001;
 
 const app = express();
@@ -28,8 +25,9 @@ app.get('/api/notes', (req, res) => {
 
   // Log our request to the terminal
   console.info(`${req.method} request received to get notes`);
-
-  res.json(JSON.stringify(db.notes));
+  const data = db.notes
+  //console.log('data -> ', data)
+  res.json(data);
 });
 
 app.post('/api/notes', (req, res) => {
@@ -53,7 +51,7 @@ app.post('/api/notes', (req, res) => {
   }
 });
 
-app.delete('/api/notes', (req, res) => {
+app.delete('/api/notes/:id', (req, res) => {
 
 });
 

@@ -10,7 +10,7 @@ const dbPath = path.join(__dirname, '../db/db.json');
 
 let prevSession = loadSavedNotes();
 let notes = prevSession;
-console.log('yo notes are -> ', notes);
+
 // Set of all uuids generated for the current notes
 let usedUuids = new Set(notes.map((note) => note.uuid));
 
