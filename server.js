@@ -25,7 +25,7 @@ app.get('/api/notes', (req, res) => {
 
   // Log our request to the terminal
   console.info(`${req.method} request received to get notes`);
-  const data = db.notes
+  const data = db.loadSavedNotes();
   //console.log('data -> ', data)
   res.json(data);
 });
@@ -38,20 +38,17 @@ app.post('/api/notes', (req, res) => {
     const newNote = new db.Note(title, text);
     db.addNote(newNote);
 
-    // Send back the new note JSON as a response
-    const response = {
-      status: 'success',
-      body: newNote,
-    };
-    
-    console.log(response);
-    res.status(201).json(response);
+    res.status(201).json(newNote);
   } else {
     res.status(500).json('Error in saving note');
   }
 });
 
 app.delete('/api/notes/:id', (req, res) => {
+  const id = req.params.id;
+  console.log(`Got a delete request for note id: ${id}`)
+  db.deleteNote(id);
+  res.status(200).json({uuid: id});
 
 });
 
