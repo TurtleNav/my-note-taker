@@ -2,9 +2,7 @@ const path = require('path');
 
 const express = require('express');
 
-const {getUUID} = require('./utils/uuid');
 const db = require('./utils/db');
-
 
 const PORT = process.env.PORT || 3001;
 
@@ -35,30 +33,29 @@ app.get('/api/notes', (req, res) => {
 });
 
 app.post('/api/notes', (req, res) => {
-    console.info(`${req.method} request received to notes`);
+  console.info(`${req.method} request received to notes`);
 
-    const {title, text} = req.body;
-    if (title && text) {
-        const newNote = {
-            title: title,
-            text: text,
-            uuid: getUUID(),
-        };
-        db.addNote(newNote);
+  const {title, text} = req.body;
+  if (title && text) {
+    const newNote = new db.Note(title, text);
+    db.addNote(newNote);
 
-        // Send back the new note JSON as a response
-        const response = {
-            status: 'success',
-            body: newNote,
-          };
-      
-        console.log(response);
-        res.status(201).json(response);
-    } else {
-        res.status(500).json('Error in saving note');
-    }
+    // Send back the new note JSON as a response
+    const response = {
+      status: 'success',
+      body: newNote,
+    };
+    
+    console.log(response);
+    res.status(201).json(response);
+  } else {
+    res.status(500).json('Error in saving note');
+  }
 });
 
+app.delete('/api/notes', (req, res) => {
+
+});
 
 // Added the below wildcard route to redirect to the mainpage upon visiting
 // any page besides the notes page

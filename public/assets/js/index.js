@@ -129,11 +129,15 @@ const handleRenderBtns = () => {
 
 // Render the list of note titles
 const renderNoteList = async (notes) => {
-  let jsonNotes = await notes.json();
+  let jsonNotes;
+  try {
+    jsonNotes = JSON.parse(await notes.json());
+  } catch (err) {
+    return console.error(err);
+  }
   if (window.location.pathname === '/notes') {
     noteList.forEach((el) => (el.innerHTML = ''));
   }
-
   let noteListItems = [];
 
   // Returns HTML element with or without a delete button
@@ -165,7 +169,7 @@ const renderNoteList = async (notes) => {
     return liEl;
   };
 
-  if (jsonNotes.length === 0) {
+  if (!jsonNotes.length) {
     noteListItems.push(createLi('No saved Notes', false));
   }
 

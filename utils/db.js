@@ -9,9 +9,8 @@ const { getUUID } = require('./uuid');
 const dbPath = path.join(__dirname, '../db/db.json');
 
 let prevSession = loadSavedNotes();
-let currentSession = [];
-let notes = prevSession.concat(currentSession);
-
+let notes = prevSession;
+console.log('yo notes are -> ', notes);
 // Set of all uuids generated for the current notes
 let usedUuids = new Set(notes.map((note) => note.uuid));
 
@@ -25,13 +24,12 @@ const Note = function(title, text) {
         // a randomly chosen note
         if (notes.length >= (2**16)) {
             console.error('Max note count has been reached');
-            // replace a random note
             uuid = getUUID();
             deleteNote(uuid);
         } else {
             do {
                 uuid = getUUID();
-            } while (!usedUuids.has(uuid));
+            } while (usedUuids.has(uuid));
         }
         usedUuids.add(uuid);
         return uuid;
@@ -39,7 +37,9 @@ const Note = function(title, text) {
 }
 
 function loadSavedNotes() {
-    return fs.readFileSync(dbPath, 'utf8', (err, data) => data ? JSON.parse(data) : []);
+    const data = fs.readFileSync(dbPath, 'utf8');
+    return data ? JSON.parse(data) : [];
+    //return fs.readFileSync(dbPath, 'utf8', (err, data) => data ? JSON.parse(data) : []);
 }
 
 function saveNotes() {
@@ -59,18 +59,18 @@ function saveNotes() {
 // note then a new ones will be created until the UUID is guaranteed to be
 // unique
 function addNote(note) {
-    currentSession.push(note);
+    notes.push(note);
 }
 
 function deleteNote(uuid) {
-    let i=0;
+    let i = 0;
     do {
-        if (this.notes[i].uuid === uuid) {
+        if (notes[i].uuid === uuid) {
             console.log(`Deleting a note with a UUID matching: ${uuid}`);
-            this.notes.splice(i,1);
+            notes.splice(i,1);
             break;
         }
-        if (i++ > this.notes.length) {
+        if (i++ > notes.length) {
             console.log(`A note with a UUID matching ${uuid} was not found`);
             break;
         }
@@ -78,11 +78,11 @@ function deleteNote(uuid) {
 }
 
 // Three different handlers 
-process.on('exit', (code) => db.save());
+process.on('exit', (code) => saveNotes());
 process.on('SIGINT', () => {
     console.log("\nReceived a SIGINT, program will save any cached notes and then exit\n");
     process.exit();
 }); // Admin terminates server.js (most likely presses ctrl+C)
-process.on('SIGTERM', () => db.save());
+process.on('SIGTERM', () => saveNotes());
 
 module.exports = {loadSavedNotes, saveNotes, addNote, deleteNote, notes, Note}
